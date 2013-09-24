@@ -1,4 +1,4 @@
-# Redis Extension for Flume NG
+# Redis Extension for Flume NG [![Build Status](https://travis-ci.org/chiwanpark/flume-ng-redis.png?branch=master)](https://travis-ci.org/chiwanpark/flume-ng-redis)
 
 Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)). Tested with Apache Flume 1.4.0 and Redis 2.6.14.
 
