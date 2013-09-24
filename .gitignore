@@ -1,0 +1,6 @@
+# for IntelliJ IDEA
+.idea/*
+*.iml
+
+# Maven output directory
+target/*
