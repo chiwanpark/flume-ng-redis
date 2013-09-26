@@ -5,3 +5,5 @@ jdk:
   - openjdk6
 services:
   - redis-server
+after_success:
+  - mvn clean jacoco:report coveralls:jacoco
