@@ -78,6 +78,9 @@
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>${coverall.version}</version>
+                <configuration>
+                    <serviceName>travis-ci</serviceName>
+                </configuration>
             </plugin>
         </plugins>
     </build>
