@@ -14,6 +14,7 @@
         <project.build.targetVersion>1.6</project.build.targetVersion>
         <flume.version>1.4.0</flume.version>
         <jedis.version>2.2.0</jedis.version>
+        <coverall.version>2.0.1</coverall.version>
     </properties>
 
 
@@ -58,6 +59,11 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${coverall.version}</version>
             </plugin>
         </plugins>
     </build>
