@@ -41,14 +41,6 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
-                <executions>
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -80,6 +72,7 @@
                 <version>${coverall.version}</version>
                 <configuration>
                     <serviceName>travis-ci</serviceName>
+                    <repoToken>${env.COVERALLS_REPO_TOKEN}</repoToken>
                 </configuration>
             </plugin>
         </plugins>

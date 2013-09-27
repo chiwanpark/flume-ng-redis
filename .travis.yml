@@ -5,5 +5,12 @@ jdk:
   - openjdk7
   - openjdk6
 
+env:
+  global:
+    - secure: "qUxCFouPoRo9a7rmPLiKpjvzZ0AlOxQ+/GhRq/P5MxLpnuFwwUzfBI0Q+vF+DP24tY/qDsXJI5AsWnkygamS+HxqGoZYK7hX5bGeUynN0X+spvgzciiqWso8FoWNp8wHztITtEISHT31IIDsOxfrAtMeHKbTvjtAbs3JDDZdRIM="
+
 services:
   - redis-server
+
+after_script:
+  - mvn jacoco:report coveralls:jacoco
