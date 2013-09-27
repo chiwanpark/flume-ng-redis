@@ -12,5 +12,5 @@ env:
 services:
   - redis-server
 
-after_script:
-  - mvn jacoco:report coveralls:jacoco
+script:
+  - mvn package jacoco:report coveralls:jacoco
