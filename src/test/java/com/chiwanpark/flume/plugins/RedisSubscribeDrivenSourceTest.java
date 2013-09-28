@@ -13,11 +13,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 @RunWith(JUnit4.class)
 public class RedisSubscribeDrivenSourceTest {
 
+    private Logger logger = LoggerFactory.getLogger(RedisSubscribeDrivenSourceTest.class);
     private Context context = new Context();
     private Channel channel = new MemoryChannel();
     private ChannelSelector channelSelector = new ReplicatingChannelSelector();
@@ -35,7 +38,9 @@ public class RedisSubscribeDrivenSourceTest {
         source.setChannelProcessor(new ChannelProcessor(channelSelector));
         Configurables.configure(source, context);
 
+        logger.info("Try to start RedisSubscribeDrivenSource.");
         source.start();
+        Thread.sleep(1000);
     }
 
     @After
@@ -47,16 +52,11 @@ public class RedisSubscribeDrivenSourceTest {
     public void testSubscribe() throws Exception {
         String message = "testSubscribeMessage!";
 
-        try {
-            source.start();
+        logger.info("Try to send message to redis source.");
+        sendMessageToRedis("flume-ng-redis-test", message);
+        Thread.sleep(2000);
 
-            sendMessageToRedis("flume-ng-redis-test", message);
-            Thread.sleep(4000);
-
-            Assert.assertEquals(message, getMessageFromChannel());
-        } finally {
-            source.stop();
-        }
+        Assert.assertEquals(message, getMessageFromChannel());
     }
 
     private void sendMessageToRedis(String channel, String message) throws Exception {
