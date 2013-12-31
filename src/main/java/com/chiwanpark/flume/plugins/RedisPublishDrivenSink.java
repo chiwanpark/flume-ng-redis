@@ -63,11 +63,14 @@ public class RedisPublishDrivenSink extends AbstractSink implements Configurable
       transaction.begin();
 
       Event event = channel.take();
-      jedis.publish(redisChannel, new String(event.getBody(), messageCharset));
 
-      transaction.commit();
-
-      status = Status.READY;
+      if (jedis.publish(redisChannel, new String(event.getBody(), messageCharset)) > 0) {
+        transaction.commit();
+        status = Status.READY;
+      } else {
+        throw new EventDeliveryException(
+            "Event is published, but there is no receiver in this channel named " + redisChannel);
+      }
     } catch (Throwable e) {
       transaction.rollback();
       status = Status.BACKOFF;
