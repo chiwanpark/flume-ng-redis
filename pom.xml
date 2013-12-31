@@ -5,7 +5,7 @@
 
     <groupId>com.chiwanpark.flume.plugins</groupId>
     <artifactId>flume-ng-redis</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <packaging>jar</packaging>
 
     <properties>

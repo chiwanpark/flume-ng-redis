@@ -6,21 +6,31 @@ Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)
 
 ## Current Version
 
-* Development: 0.1-SNAPSHOT
-* Stable: none
+* Development: 0.2-SNAPSHOT
+* Stable: 0.1
 
 ## Current Supported Features
 
-* Custom sources using Redis [SUBSCRIBE](http://redis.io/commands/subscribe) command (single channel)
+* Source using Redis [SUBSCRIBE](http://redis.io/commands/subscribe) command (single channel)
+* Sink using Redis [PUBLISH](http://redis.io/commands/publish) command (single channel)
 
 ## Usage
 
-1. Build this library witn ```mvn package``` command.
+1. Build or Download jar.
+    * Checkout and build this repository.
+        1. Stable release (currently version 0.1) is recommended.
+        1. Build this library with ```mvn package``` command.
+    * Or download built jar in release page. ([https://github.com/chiwanpark/flume-ng-redis/releases](https://github.com/chiwanpark/flume-ng-redis/releases))
 1. Copy ```flume-ng-redis-[VERSION].jar``` or ```flume-ng-redis-[VERSION]-jar-with-dependencies.jar``` into your flume library path.
+	* If you use ```flume-ng-redis-[VERSION].jar```, you have to download Jedis ([https://github.com/xetorthio/jedis](https://github.com/xetorthio/jedis)) and copy it to flume library path.
 1. Copy configuration sample file or create your own configuration.
-1. Run Flume. (Following command is sample for RedisSubscribeDrivenSource.)
+1. Run Flume.
+	* Following command is sample for RedisSubscribeDrivenSource.
 
-		bin/flume-ng agent -n agent -c conf -f conf/example-SubscribeDrivenSource.properties -Dflume.root.logger=DEBUG,console
+			bin/flume-ng agent -n agent -c conf -f conf/example-SubscribeDrivenSource.properties -Dflume.root.logger=DEBUG,console
+	* Following commend is sample for RedisPublishDrivenSink
+	
+			bin/flume-ng agent -n -agent -c conf -f conf/example-PublishDrivenSink.properties
 
 ## Dependencies
 
