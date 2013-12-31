@@ -65,6 +65,8 @@ public class RedisSubscribeDrivenSourceTest {
     Jedis jedis = new Jedis("localhost", 6379);
 
     jedis.publish(channel, message);
+
+    jedis.disconnect();
   }
 
   private String getMessageFromChannel() throws Exception {
