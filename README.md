@@ -30,7 +30,7 @@ Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)
 			bin/flume-ng agent -n agent -c conf -f conf/example-SubscribeDrivenSource.properties -Dflume.root.logger=DEBUG,console
 	* Following commend is sample for RedisPublishDrivenSink
 	
-			bin/flume-ng agent -n -agent -c conf -f conf/example-PublishDrivenSink.properties
+			bin/flume-ng agent -n agent -c conf -f conf/example-PublishDrivenSink.properties
 
 ## Dependencies
 
