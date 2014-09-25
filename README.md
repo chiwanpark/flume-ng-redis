@@ -6,7 +6,7 @@ Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)
 
 ## Current Version
 
-* Development: 0.2-SNAPSHOT
+* Development: 0.2.0-SNAPSHOT
 * Stable: 0.1
 
 ## Current Supported Features
