@@ -16,7 +16,6 @@
 package com.chiwanpark.flume.plugins;
 
 import com.google.common.collect.Lists;
-
 import org.apache.flume.Channel;
 import org.apache.flume.ChannelSelector;
 import org.apache.flume.Context;
@@ -34,13 +33,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.nio.charset.Charset;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPubSub;
 
 @RunWith(JUnit4.class)
 public class RedisPublishDrivenSinkTest {
@@ -78,7 +77,11 @@ public class RedisPublishDrivenSinkTest {
     thread = new Thread(new Runnable() {
       @Override
       public void run() {
-        jedis.subscribe(listener, TEST_CHANNEL);
+        try {
+          jedis.subscribe(listener, TEST_CHANNEL);
+        } catch (JedisConnectionException e) {
+          logger.info("Jedis is disconnected.");
+        }
       }
     });
 
