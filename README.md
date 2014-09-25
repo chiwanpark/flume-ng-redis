@@ -1,8 +1,10 @@
 # Redis Extension for Flume NG
 
-Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)). Tested with Apache Flume 1.4.0 and Redis 2.6.14.
+Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)). Tested with Apache Flume 1.5.0.1 and
+Redis 2.8.17.
 
-[![Build Status](https://travis-ci.org/chiwanpark/flume-ng-redis.png?branch=master)](https://travis-ci.org/chiwanpark/flume-ng-redis) [![Coverage Status](https://coveralls.io/repos/chiwanpark/flume-ng-redis/badge.png)](https://coveralls.io/r/chiwanpark/flume-ng-redis)
+[![Build Status](https://travis-ci.org/chiwanpark/flume-ng-redis.png?branch=master)](https://travis-ci.org/chiwanpark/flume-ng-redis)
+[![Coverage Status](https://coveralls.io/repos/chiwanpark/flume-ng-redis/badge.png)](https://coveralls.io/r/chiwanpark/flume-ng-redis)
 
 ## Current Version
 
@@ -20,21 +22,25 @@ Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)
     * Checkout and build this repository.
         1. Stable release (currently version 0.1) is recommended.
         1. Build this library with ```mvn package``` command.
-    * Or download built jar in release page. ([https://github.com/chiwanpark/flume-ng-redis/releases](https://github.com/chiwanpark/flume-ng-redis/releases))
-1. Copy ```flume-ng-redis-[VERSION].jar``` or ```flume-ng-redis-[VERSION]-jar-with-dependencies.jar``` into your flume library path.
-	* If you use ```flume-ng-redis-[VERSION].jar```, you have to download Jedis ([https://github.com/xetorthio/jedis](https://github.com/xetorthio/jedis)) and copy it to flume library path.
+    * Or download built jar in release page.
+      ([https://github.com/chiwanpark/flume-ng-redis/releases](https://github.com/chiwanpark/flume-ng-redis/releases))
+1. Copy ```flume-ng-redis-[VERSION].jar``` or ```flume-ng-redis-[VERSION]-jar-with-dependencies.jar``` into your flume
+   library path.
+	* If you use ```flume-ng-redis-[VERSION].jar```, you have to download Jedis
+	  ([https://github.com/xetorthio/jedis](https://github.com/xetorthio/jedis)) and copy it to flume library path.
 1. Copy configuration sample file or create your own configuration.
 1. Run Flume.
 	* Following command is sample for RedisSubscribeDrivenSource.
 
 			bin/flume-ng agent -n agent -c conf -f conf/example-SubscribeDrivenSource.properties -Dflume.root.logger=DEBUG,console
+	
 	* Following commend is sample for RedisPublishDrivenSink
 	
 			bin/flume-ng agent -n agent -c conf -f conf/example-PublishDrivenSink.properties
 
 ## Dependencies
 
-* Jedis 2.2.0 ([https://github.com/xetorthio/jedis](https://github.com/xetorthio/jedis))
+* Jedis 2.5.2 ([https://github.com/xetorthio/jedis](https://github.com/xetorthio/jedis))
 
 ## License
 
