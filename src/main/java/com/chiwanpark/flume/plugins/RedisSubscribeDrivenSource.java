@@ -42,6 +42,8 @@ public class RedisSubscribeDrivenSource extends AbstractSource
   private int redisPort;
   private String redisChannel;
   private int redisTimeout;
+  private String redisPassword;
+  private int redisDatabase;
   private String messageCharset;
 
   private boolean runFlag;
@@ -53,6 +55,8 @@ public class RedisSubscribeDrivenSource extends AbstractSource
     redisPort = context.getInteger("redisPort", 6379);
     redisChannel = context.getString("redisChannel");
     redisTimeout = context.getInteger("redisTimeout", 2000);
+    redisPassword = context.getString("redisPassword", "");
+    redisDatabase = context.getInteger("redisDatabase", 0);
     messageCharset = context.getString("messageCharset", "utf-8");
 
     if (redisChannel == null) { throw new RuntimeException("Redis Channel must be set."); }
@@ -68,8 +72,15 @@ public class RedisSubscribeDrivenSource extends AbstractSource
 
     // TODO: consider using Connection Pool.
     jedis = new Jedis(redisHost, redisPort, redisTimeout);
+    if (redisPassword != "") {
+        jedis.auth(redisPassword);
+    }
+    if (redisDatabase != 0) {
+        jedis.select(redisDatabase);
+    }
     logger.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
-                + ", timeout: " + String.valueOf(redisTimeout) + ")");
+                + ", timeout: " + String.valueOf(redisTimeout)
+                + ", database: " + String.valueOf(redisDatabase) + ")");
 
     runFlag = true;
 
