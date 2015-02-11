@@ -72,7 +72,7 @@ public class RedisSubscribeDrivenSource extends AbstractSource
 
     // TODO: consider using Connection Pool.
     jedis = new Jedis(redisHost, redisPort, redisTimeout);
-    if (redisPassword != "") {
+    if (!"".equals(redisPassword)) {
       jedis.auth(redisPassword);
     }
     if (redisDatabase != 0) {
