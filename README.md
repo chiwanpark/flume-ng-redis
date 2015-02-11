@@ -8,13 +8,13 @@ Redis 2.8.17.
 
 ## Current Version
 
-* Development: 0.2.0-SNAPSHOT
-* Stable: 0.1
+* Development: 0.3.0-SNAPSHOT
+* Stable: 0.2.0
 
 ## Current Supported Features
 
-* Source using Redis [SUBSCRIBE](http://redis.io/commands/subscribe) command (single channel)
-* Sink using Redis [PUBLISH](http://redis.io/commands/publish) command (single channel)
+* Source using Redis [SUBSCRIBE](http://redis.io/commands/subscribe) command (multiple channels)
+* Sink using Redis [PUBLISH](http://redis.io/commands/publish) command (only for single channel)
 
 ## Usage
 
@@ -44,7 +44,7 @@ Redis 2.8.17.
 
 ## License
 
-Copyright 2013 Chiwan Park
+Copyright 2013-2015 Chiwan Park
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
