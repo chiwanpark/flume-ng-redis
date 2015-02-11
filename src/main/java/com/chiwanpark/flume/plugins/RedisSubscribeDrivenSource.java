@@ -40,7 +40,7 @@ public class RedisSubscribeDrivenSource extends AbstractSource
   private Jedis jedis;
   private String redisHost;
   private int redisPort;
-  private String redisChannel;
+  private String[] redisChannels;
   private int redisTimeout;
   private String redisPassword;
   private int redisDatabase;
@@ -53,13 +53,14 @@ public class RedisSubscribeDrivenSource extends AbstractSource
   public void configure(Context context) {
     redisHost = context.getString("redisHost", "localhost");
     redisPort = context.getInteger("redisPort", 6379);
-    redisChannel = context.getString("redisChannel");
     redisTimeout = context.getInteger("redisTimeout", 2000);
     redisPassword = context.getString("redisPassword", "");
     redisDatabase = context.getInteger("redisDatabase", 0);
     messageCharset = context.getString("messageCharset", "utf-8");
 
+    String redisChannel = context.getString("redisChannel");
     if (redisChannel == null) { throw new RuntimeException("Redis Channel must be set."); }
+    redisChannels = redisChannel.split(",");
 
     logger.info("Flume Redis Subscribe Source Configured");
   }
@@ -125,7 +126,7 @@ public class RedisSubscribeDrivenSource extends AbstractSource
       }
 
       // TODO: think better way for thread safety.
-      jedisPubSub.unsubscribe(redisChannel);
+      jedisPubSub.unsubscribe(redisChannels);
     }
   }
 
@@ -141,7 +142,7 @@ public class RedisSubscribeDrivenSource extends AbstractSource
 
     @Override
     public void run() {
-      jedis.subscribe(jedisPubSub, redisChannel);
+      jedis.subscribe(jedisPubSub, redisChannels);
     }
   }
 
