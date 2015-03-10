@@ -20,8 +20,8 @@ Redis 2.8.17.
 
 1. Build or Download jar.
     * Checkout and build this repository.
-        1. Stable release (currently version 0.1) is recommended.
-        1. Build this library with ```mvn package``` command.
+        1. Stable release (currently version 0.2) is recommended.
+        1. Build this library with ```mvn package -DskipTests``` command.
     * Or download built jar in release page.
       ([https://github.com/chiwanpark/flume-ng-redis/releases](https://github.com/chiwanpark/flume-ng-redis/releases))
 1. Copy ```flume-ng-redis-[VERSION].jar``` or ```flume-ng-redis-[VERSION]-jar-with-dependencies.jar``` into your flume
