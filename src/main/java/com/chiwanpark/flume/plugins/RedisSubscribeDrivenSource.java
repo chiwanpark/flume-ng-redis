@@ -15,18 +15,19 @@
  */
 package com.chiwanpark.flume.plugins;
 
+import com.google.common.base.Throwables;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDrivenSource;
 import org.apache.flume.channel.ChannelProcessor;
 import org.apache.flume.conf.Configurable;
-import org.apache.flume.event.EventBuilder;
 import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.nio.charset.Charset;
 
@@ -43,8 +44,8 @@ public class RedisSubscribeDrivenSource extends AbstractSource
   private String[] redisChannels;
   private int redisTimeout;
   private String redisPassword;
-  private int redisDatabase;
-  private String messageCharset;
+  private String messageFormat;
+  private RedisSourceHandler handler;
 
   private boolean runFlag;
 
@@ -55,14 +56,61 @@ public class RedisSubscribeDrivenSource extends AbstractSource
     redisPort = context.getInteger("redisPort", 6379);
     redisTimeout = context.getInteger("redisTimeout", 2000);
     redisPassword = context.getString("redisPassword", "");
-    redisDatabase = context.getInteger("redisDatabase", 0);
-    messageCharset = context.getString("messageCharset", "utf-8");
+    String charset = context.getString("messageCharset", "utf-8");
+
+    try {
+      String handlerClassName = context.getString("handler", "com.chiwanpark.flume.plugins.RawHandler");
+      @SuppressWarnings("unchecked")
+      Class<? extends RedisSourceHandler> clazz =
+              (Class<? extends RedisSourceHandler>)
+              Class.forName(handlerClassName);
+      Class[] argTypes = new Class[1];
+      argTypes[0] = String.class;
+      handler = clazz.getDeclaredConstructor(argTypes).newInstance(charset);
+    } catch (ClassNotFoundException ex) {
+      logger.error("Error while configuring RedisSourceHandler. Exception follows.", ex);
+      Throwables.propagate(ex);
+    } catch (ClassCastException ex) {
+      logger.error("Handler is not an instance of RedisSourceHandler."
+              + "Handler must implement RedisSourceHandler.");
+      Throwables.propagate(ex);
+    } catch (Exception ex) {
+      logger.error("Error configuring RedisSubscribeDrivenSource!", ex);
+      Throwables.propagate(ex);
+    }
 
     String redisChannel = context.getString("redisChannel");
     if (redisChannel == null) { throw new RuntimeException("Redis Channel must be set."); }
     redisChannels = redisChannel.split(",");
 
     logger.info("Flume Redis Subscribe Source Configured");
+  }
+
+  private void Connect() {
+    logger.info("Connecting...");
+    while (true) {
+      try {
+        jedis = new Jedis(redisHost, redisPort, redisTimeout);
+        if (!"".equals(redisPassword)) {
+          jedis.auth(redisPassword);
+        }
+        else {
+          // Force a connection.
+          jedis.ping();
+        }
+        break;
+      } catch (JedisConnectionException e) {
+        logger.error("Connection failed.", e);
+        logger.info("Waiting for 10 seconds...");
+        try {
+          Thread.sleep(10000);
+        } catch (InterruptedException e2) {
+          // ?
+        }
+      }
+    }
+    logger.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
+                + ", timeout: " + String.valueOf(redisTimeout) + ")");
   }
 
   @Override
@@ -72,16 +120,7 @@ public class RedisSubscribeDrivenSource extends AbstractSource
     channelProcessor = getChannelProcessor();
 
     // TODO: consider using Connection Pool.
-    jedis = new Jedis(redisHost, redisPort, redisTimeout);
-    if (!"".equals(redisPassword)) {
-      jedis.auth(redisPassword);
-    }
-    if (redisDatabase != 0) {
-      jedis.select(redisDatabase);
-    }
-    logger.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
-                + ", timeout: " + String.valueOf(redisTimeout)
-                + ", database: " + String.valueOf(redisDatabase) + ")");
+    Connect();
 
     runFlag = true;
 
@@ -142,7 +181,16 @@ public class RedisSubscribeDrivenSource extends AbstractSource
 
     @Override
     public void run() {
-      jedis.subscribe(jedisPubSub, redisChannels);
+      while (runFlag) {
+        try {
+          jedis.subscribe(jedisPubSub, redisChannels);
+        } catch (JedisConnectionException e) {
+          logger.error("Disconnected from Redis...");
+          Connect();
+        } catch (Exception e) {
+          logger.error("FATAL ERROR: unexpected exception in SubscribeRunner.", e);
+        }
+      }
     }
   }
 
@@ -150,8 +198,13 @@ public class RedisSubscribeDrivenSource extends AbstractSource
 
     @Override
     public void onMessage(String channel, String message) {
-      Event event = EventBuilder.withBody(message, Charset.forName(messageCharset));
-      channelProcessor.processEvent(event);
+      try {
+        channelProcessor.processEvent(handler.getEvent(message));
+      }
+      catch (Exception e) {
+        logger.error("RedisSourceHandler threw unexpected exception.", e);
+        return;
+      }
     }
 
     @Override
