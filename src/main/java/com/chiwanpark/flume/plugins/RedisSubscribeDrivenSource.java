@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.nio.charset.Charset;
 
@@ -85,6 +86,33 @@ public class RedisSubscribeDrivenSource extends AbstractSource
     logger.info("Flume Redis Subscribe Source Configured");
   }
 
+  private void Connect() {
+    logger.info("Connecting...");
+    while (true) {
+      try {
+        jedis = new Jedis(redisHost, redisPort, redisTimeout);
+        if (!"".equals(redisPassword)) {
+          jedis.auth(redisPassword);
+        }
+        else {
+          // Force a connection.
+          jedis.ping();
+        }
+        break;
+      } catch (JedisConnectionException e) {
+        logger.error("Connection failed.", e);
+        logger.info("Waiting for 10 seconds...");
+        try {
+          Thread.sleep(10000);
+        } catch (InterruptedException e2) {
+          // ?
+        }
+      }
+    }
+    logger.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
+                + ", timeout: " + String.valueOf(redisTimeout) + ")");
+  }
+
   @Override
   public synchronized void start() {
     super.start();
@@ -92,12 +120,7 @@ public class RedisSubscribeDrivenSource extends AbstractSource
     channelProcessor = getChannelProcessor();
 
     // TODO: consider using Connection Pool.
-    jedis = new Jedis(redisHost, redisPort, redisTimeout);
-    if (!"".equals(redisPassword)) {
-      jedis.auth(redisPassword);
-    }
-    logger.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
-                + ", timeout: " + String.valueOf(redisTimeout) + ")");
+    Connect();
 
     runFlag = true;
 
@@ -158,7 +181,16 @@ public class RedisSubscribeDrivenSource extends AbstractSource
 
     @Override
     public void run() {
-      jedis.subscribe(jedisPubSub, redisChannels);
+      while (runFlag) {
+        try {
+          jedis.subscribe(jedisPubSub, redisChannels);
+        } catch (JedisConnectionException e) {
+          logger.error("Disconnected from Redis...");
+          Connect();
+        } catch (Exception e) {
+          logger.error("FATAL ERROR: unexpected exception in SubscribeRunner.", e);
+        }
+      }
     }
   }
 
@@ -169,8 +201,8 @@ public class RedisSubscribeDrivenSource extends AbstractSource
       try {
         channelProcessor.processEvent(handler.getEvent(message));
       }
-      catch (Exception ex) {
-        logger.warn("RedisSourceHandler threw unexpected exception. ", ex);
+      catch (Exception e) {
+        logger.error("RedisSourceHandler threw unexpected exception.", e);
         return;
       }
     }
