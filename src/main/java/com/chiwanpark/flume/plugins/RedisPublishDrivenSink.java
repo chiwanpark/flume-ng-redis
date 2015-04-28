@@ -15,21 +15,16 @@
  */
 package com.chiwanpark.flume.plugins;
 
-import org.apache.flume.Channel;
-import org.apache.flume.Context;
-import org.apache.flume.Event;
-import org.apache.flume.EventDeliveryException;
-import org.apache.flume.Transaction;
+import org.apache.flume.*;
 import org.apache.flume.conf.Configurable;
 import org.apache.flume.sink.AbstractSink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import redis.clients.jedis.Jedis;
 
 public class RedisPublishDrivenSink extends AbstractSink implements Configurable {
 
-  private Logger logger = LoggerFactory.getLogger(RedisPublishDrivenSink.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RedisPublishDrivenSink.class);
 
   private Jedis jedis;
 
@@ -51,9 +46,11 @@ public class RedisPublishDrivenSink extends AbstractSink implements Configurable
     redisDatabase = context.getInteger("redisDatabase", 0);
     messageCharset = context.getString("messageCharset", "utf-8");
 
-    if (redisChannel == null) { throw new RuntimeException("Redis Channel must be set."); }
+    if (redisChannel == null) {
+      throw new RuntimeException("Redis Channel must be set.");
+    }
 
-    logger.info("Flume Redis Publish Sink Configured");
+    LOG.info("Flume Redis Publish Sink Configured");
   }
 
   @Override
@@ -66,8 +63,8 @@ public class RedisPublishDrivenSink extends AbstractSink implements Configurable
       jedis.select(redisDatabase);
     }
 
-    logger.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
-                + ", timeout: " + String.valueOf(redisTimeout) + ")");
+    LOG.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
+        + ", timeout: " + String.valueOf(redisTimeout) + ")");
     super.start();
   }
 

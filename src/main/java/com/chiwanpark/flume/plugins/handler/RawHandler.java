@@ -13,24 +13,29 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.chiwanpark.flume.plugins;
+package com.chiwanpark.flume.plugins.handler;
 
 import org.apache.flume.Event;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.apache.flume.event.EventBuilder;
 
-import static org.junit.Assert.assertArrayEquals;
+/**
+ * RawHandler for RedisSource that accepts a string message and converts it
+ * to a flume Event having no headers and a body set to message.
+ */
+public class RawHandler extends RedisSourceHandler {
 
-@RunWith(JUnit4.class)
-public class RawHandlerTest {
+  /**
+   * {@inheritDoc}
+   */
+  public RawHandler(String charset) {
+    super(charset);
+  }
 
-  @Test
-  public void testRawMessageWithUTF8() throws Exception {
-    String testMessage = "test-UTF8, 한글";
-    RawHandler handler = new RawHandler("utf-8");
-    Event event = handler.getEvent(testMessage);
-
-    assertArrayEquals(testMessage.getBytes("utf-8"), event.getBody());
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Event getEvent(String message) throws Exception {
+    return EventBuilder.withBody(message.getBytes(charset));
   }
 }
