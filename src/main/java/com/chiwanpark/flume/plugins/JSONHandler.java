@@ -73,7 +73,7 @@ public class JSONHandler extends RedisSourceHandler {
     //be assumed.
     if (charset == null) {
       LOG.debug("Charset is null, default charset of UTF-8 will be used.");
-      charset = "UTF-8";
+      this.charset = "UTF-8";
     } else if (!(charset.equalsIgnoreCase("utf-8")
             || charset.equalsIgnoreCase("utf-16")
             || charset.equalsIgnoreCase("utf-32"))) {
@@ -101,7 +101,7 @@ public class JSONHandler extends RedisSourceHandler {
     String body = "";
     JsonElement bodyElm = json.get("body");
     if (bodyElm != null) {
-      body = bodyElm.toString();
+      body = bodyElm.getAsString();
     }
 
     HashMap<String, String> headers = null;
