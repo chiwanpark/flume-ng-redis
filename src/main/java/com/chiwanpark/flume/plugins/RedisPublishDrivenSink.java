@@ -15,57 +15,29 @@
  */
 package com.chiwanpark.flume.plugins;
 
-import org.apache.flume.*;
+import com.google.common.base.Preconditions;
+import org.apache.flume.Channel;
+import org.apache.flume.Context;
+import org.apache.flume.Event;
+import org.apache.flume.EventDeliveryException;
+import org.apache.flume.Transaction;
 import org.apache.flume.conf.Configurable;
-import org.apache.flume.sink.AbstractSink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
 
-public class RedisPublishDrivenSink extends AbstractSink implements Configurable {
-
+public class RedisPublishDrivenSink extends AbstractRedisSink implements Configurable {
   private static final Logger LOG = LoggerFactory.getLogger(RedisPublishDrivenSink.class);
 
-  private Jedis jedis;
-
-  private String redisHost;
-  private int redisPort;
   private String redisChannel;
-  private int redisTimeout;
-  private String redisPassword;
-  private int redisDatabase;
-  private String messageCharset;
 
   @Override
   public void configure(Context context) {
-    redisHost = context.getString("redisHost", "localhost");
-    redisPort = context.getInteger("redisPort", 6379);
     redisChannel = context.getString("redisChannel");
-    redisTimeout = context.getInteger("redisTimeout", 2000);
-    redisPassword = context.getString("redisPassword", "");
-    redisDatabase = context.getInteger("redisDatabase", 0);
-    messageCharset = context.getString("messageCharset", "utf-8");
 
-    if (redisChannel == null) {
-      throw new RuntimeException("Redis Channel must be set.");
-    }
+    Preconditions.checkNotNull(redisChannel, "Redis Channel must be set.");
 
+    super.configure(context);
     LOG.info("Flume Redis Publish Sink Configured");
-  }
-
-  @Override
-  public synchronized void start() {
-    jedis = new Jedis(redisHost, redisPort, redisTimeout);
-    if (!"".equals(redisPassword)) {
-      jedis.auth(redisPassword);
-    }
-    if (redisDatabase != 0) {
-      jedis.select(redisDatabase);
-    }
-
-    LOG.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
-        + ", timeout: " + String.valueOf(redisTimeout) + ")");
-    super.start();
   }
 
   @Override
