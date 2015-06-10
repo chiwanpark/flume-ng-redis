@@ -1,5 +1,7 @@
 package com.chiwanpark.flume.plugins;
 
+import com.chiwanpark.flume.plugins.handler.RedisMessageHandler;
+import com.google.common.base.Throwables;
 import org.apache.flume.Context;
 import org.apache.flume.conf.Configurable;
 import org.apache.flume.sink.AbstractSink;
@@ -16,7 +18,7 @@ public abstract class AbstractRedisSink extends AbstractSink implements Configur
   private int redisPort;
   private int redisTimeout;
   private String redisPassword;
-  protected String messageCharset;
+  protected RedisMessageHandler messageHandler;
 
   @Override
   public synchronized void start() {
@@ -43,6 +45,22 @@ public abstract class AbstractRedisSink extends AbstractSink implements Configur
     redisPort = context.getInteger("redisPort", 6379);
     redisTimeout = context.getInteger("redisTimeout", 2000);
     redisPassword = context.getString("redisPassword", "");
-    messageCharset = context.getString("messageCharset", "utf-8");
+
+    try {
+      String charset = context.getString("messageCharset", "utf-8");
+      String handlerClassName = context.getString("handler", "com.chiwanpark.flume.plugins.handler.RawHandler");
+      @SuppressWarnings("unchecked")
+      Class<? extends RedisMessageHandler> clazz = (Class<? extends RedisMessageHandler>) Class.forName(handlerClassName);
+      messageHandler = clazz.getDeclaredConstructor(String.class).newInstance(charset);
+    } catch (ClassNotFoundException ex) {
+      LOG.error("Error while configuring RedisMessageHandler. Exception follows.", ex);
+      Throwables.propagate(ex);
+    } catch (ClassCastException ex) {
+      LOG.error("Handler is not an instance of RedisMessageHandler. Handler must implement RedisMessageHandler.");
+      Throwables.propagate(ex);
+    } catch (Exception ex) {
+      LOG.error("Error configuring RedisSubscribeDrivenSource!", ex);
+      Throwables.propagate(ex);
+    }
   }
 }

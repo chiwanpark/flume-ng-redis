@@ -16,11 +16,15 @@
 package com.chiwanpark.flume.plugins.handler;
 
 import org.apache.flume.Event;
+import org.apache.flume.event.EventBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -61,5 +65,44 @@ public class JSONHandlerTest {
     Event event = handler.getEvent(jsonified);
 
     assertArrayEquals("한글".getBytes("utf-8"), event.getBody());
+  }
+
+  @Test
+  public void testJsonSerialization() throws Exception {
+    final String message = "hello";
+    final String charset = "utf-8";
+    final String expected = "{\"body\":\"hello\"}";
+    JSONHandler handler = new JSONHandler(charset);
+    Event event = EventBuilder.withBody(message, Charset.forName(charset));
+
+    String jsonified = handler.getString(event);
+    assertEquals(expected, jsonified);
+  }
+
+  @Test
+  public void testJsonSerializationWithHeadersAndBody() throws Exception {
+    final String message = "hello";
+    final Map<String, String> headers = new HashMap<String, String>();
+    headers.put("hello", "goodbye");
+
+    final String charset = "utf-8";
+    final String expected = "{\"body\":\"hello\",\"headers\":{\"hello\":\"goodbye\"}}";
+    JSONHandler handler = new JSONHandler(charset);
+    Event event = EventBuilder.withBody(message, Charset.forName(charset), headers);
+
+    String jsonified = handler.getString(event);
+    assertEquals(expected, jsonified);
+  }
+
+  @Test
+  public void testJsonSerde() throws Exception {
+    final String expected = "{\"body\":\"hello\",\"headers\":{\"hello\":\"goodbye\"}}";
+    final String charset = "utf-8";
+
+    JSONHandler handler = new JSONHandler(charset);
+    Event event = handler.getEvent(expected);
+    String result = handler.getString(event);
+
+    assertEquals(result, expected);
   }
 }

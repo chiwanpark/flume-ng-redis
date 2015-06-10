@@ -57,8 +57,9 @@ public class RedisPublishDrivenSink extends AbstractRedisSink implements Configu
       transaction.begin();
 
       Event event = channel.take();
+      String serialized = messageHandler.getString(event);
 
-      if (jedis.publish(redisChannel, new String(event.getBody(), messageCharset)) > 0) {
+      if (jedis.publish(redisChannel, serialized) > 0) {
         transaction.commit();
         status = Status.READY;
       } else {

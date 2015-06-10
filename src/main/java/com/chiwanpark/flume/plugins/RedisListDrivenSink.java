@@ -54,8 +54,9 @@ public class RedisListDrivenSink extends AbstractRedisSink {
       transaction.begin();
 
       Event event = channel.take();
+      String serialized = messageHandler.getString(event);
 
-      if (jedis.lpush(redisList, new String(event.getBody(), messageCharset)) > 0) {
+      if (jedis.lpush(redisList, serialized) > 0) {
         transaction.commit();
         status = Status.READY;
       } else {

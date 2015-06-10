@@ -22,7 +22,7 @@ import org.apache.flume.event.EventBuilder;
  * RawHandler for RedisSource that accepts a string message and converts it
  * to a flume Event having no headers and a body set to message.
  */
-public class RawHandler extends RedisSourceHandler {
+public class RawHandler extends RedisMessageHandler {
 
   /**
    * {@inheritDoc}
@@ -37,5 +37,13 @@ public class RawHandler extends RedisSourceHandler {
   @Override
   public Event getEvent(String message) throws Exception {
     return EventBuilder.withBody(message.getBytes(charset));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getString(Event event) throws Exception {
+    return new String(event.getBody(), charset);
   }
 }

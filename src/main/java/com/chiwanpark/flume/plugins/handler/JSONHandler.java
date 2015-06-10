@@ -15,9 +15,11 @@
  */
 package com.chiwanpark.flume.plugins.handler;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import org.apache.flume.Event;
 import org.apache.flume.event.EventBuilder;
 import org.slf4j.Logger;
@@ -50,10 +52,11 @@ import java.util.Map;
  * set in the request, then the charset is assumed to be JSON's default - UTF-8.
  * The JSON handler supports UTF-8, UTF-16 and UTF-32.
  */
-public class JSONHandler extends RedisSourceHandler {
+public class JSONHandler extends RedisMessageHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(JSONHandler.class);
   private final JsonParser parser;
+  private final Gson gson;
 
   /**
    * {@inheritDoc}
@@ -73,6 +76,7 @@ public class JSONHandler extends RedisSourceHandler {
     }
 
     parser = new JsonParser();
+    gson = new Gson();
   }
 
   public JSONHandler() {
@@ -96,7 +100,7 @@ public class JSONHandler extends RedisSourceHandler {
       body = bodyElm.getAsString();
     }
 
-    HashMap<String, String> headers = null;
+    Map<String, String> headers = null;
     if (json.has("headers")) {
       headers = new HashMap<String, String>();
       for (Map.Entry<String, JsonElement> header : json.get("headers").getAsJsonObject().entrySet()) {
@@ -111,5 +115,22 @@ public class JSONHandler extends RedisSourceHandler {
     }
 
     return EventBuilder.withBody(body.getBytes(charset), headers);
+  }
+
+  @Override
+  public String getString(Event event) throws Exception {
+    JsonPrimitive body = new JsonPrimitive(new String(event.getBody(), charset));
+    JsonObject obj = new JsonObject();
+
+    obj.add("body", body);
+    if (!event.getHeaders().isEmpty()) {
+      JsonObject headers = new JsonObject();
+      for (Map.Entry<String, String> header : event.getHeaders().entrySet()) {
+        headers.add(header.getKey(), new JsonPrimitive(header.getValue()));
+      }
+      obj.add("headers", headers);
+    }
+
+    return gson.toJson(obj);
   }
 }

@@ -18,9 +18,9 @@ package com.chiwanpark.flume.plugins.handler;
 import org.apache.flume.Event;
 
 /**
- * Event handler interface for RedisSource.
+ * Message handler interface for RedisSource and RedisSink.
  */
-public abstract class RedisSourceHandler {
+public abstract class RedisMessageHandler {
 
   protected String charset;
 
@@ -29,7 +29,7 @@ public abstract class RedisSourceHandler {
    *
    * @param charset The charset of the messages.
    */
-  public RedisSourceHandler(String charset) {
+  public RedisMessageHandler(String charset) {
     this.charset = charset;
   }
 
@@ -44,4 +44,15 @@ public abstract class RedisSourceHandler {
    * @throws Exception If there was an unexpected error.
    */
   public abstract Event getEvent(String message) throws Exception;
+
+  /**
+   * Takes a event and returns a string representing the event. The result
+   * of this method could be parsed as a Flume event by getEvent method. If
+   * this request cannot succeed, this method will throw exception.
+   *
+   * @param event The event to be serialized.
+   * @return String representing the given event.
+   * @throws Exception If there was an unexpected error.
+   */
+  public abstract String getString(Event event) throws Exception;
 }
