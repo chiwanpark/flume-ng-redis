@@ -15,108 +15,36 @@
  */
 package com.chiwanpark.flume.plugins;
 
-import com.chiwanpark.flume.plugins.handler.RedisSourceHandler;
-import com.google.common.base.Throwables;
+import com.google.common.base.Preconditions;
 import org.apache.flume.Context;
 import org.apache.flume.EventDrivenSource;
-import org.apache.flume.channel.ChannelProcessor;
-import org.apache.flume.conf.Configurable;
-import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
-public class RedisSubscribeDrivenSource extends AbstractSource implements Configurable, EventDrivenSource {
+public class RedisSubscribeDrivenSource extends AbstractRedisSource implements EventDrivenSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisSubscribeDrivenSource.class);
 
-  private ChannelProcessor channelProcessor;
-
-  private Jedis jedis;
-  private String redisHost;
-  private int redisPort;
   private String[] redisChannels;
-  private int redisTimeout;
-  private String redisPassword;
-  private RedisSourceHandler handler;
-
   private boolean runFlag;
-
 
   @Override
   public void configure(Context context) {
-    redisHost = context.getString("redisHost", "localhost");
-    redisPort = context.getInteger("redisPort", 6379);
-    redisTimeout = context.getInteger("redisTimeout", 2000);
-    redisPassword = context.getString("redisPassword", "");
-
-    try {
-      String charset = context.getString("messageCharset", "utf-8");
-      String handlerClassName = context.getString("handler", "com.chiwanpark.flume.plugins.handler.RawHandler");
-      @SuppressWarnings("unchecked")
-      Class<? extends RedisSourceHandler> clazz = (Class<? extends RedisSourceHandler>) Class.forName(handlerClassName);
-      Class[] argTypes = new Class[1];
-      argTypes[0] = String.class;
-      handler = clazz.getDeclaredConstructor(argTypes).newInstance(charset);
-    } catch (ClassNotFoundException ex) {
-      LOG.error("Error while configuring RedisSourceHandler. Exception follows.", ex);
-      Throwables.propagate(ex);
-    } catch (ClassCastException ex) {
-      LOG.error("Handler is not an instance of RedisSourceHandler. Handler must implement RedisSourceHandler.");
-      Throwables.propagate(ex);
-    } catch (Exception ex) {
-      LOG.error("Error configuring RedisSubscribeDrivenSource!", ex);
-      Throwables.propagate(ex);
-    }
-
     String redisChannel = context.getString("redisChannel");
-    if (redisChannel == null) {
-      throw new RuntimeException("Redis Channel must be set.");
-    }
+    Preconditions.checkNotNull(redisChannel, "Redis Channel must be set.");
     redisChannels = redisChannel.split(",");
 
+    super.configure(context);
     LOG.info("Flume Redis Subscribe Source Configured");
-  }
-
-  private void connect() {
-    LOG.info("Connecting...");
-    while (true) {
-      try {
-        jedis = new Jedis(redisHost, redisPort, redisTimeout);
-        if (!"".equals(redisPassword)) {
-          jedis.auth(redisPassword);
-        } else {
-          // Force a connection.
-          jedis.ping();
-        }
-        break;
-      } catch (JedisConnectionException e) {
-        LOG.error("Connection failed.", e);
-        LOG.info("Waiting for 10 seconds...");
-        try {
-          Thread.sleep(10000);
-        } catch (InterruptedException e2) {
-          // ?
-        }
-      }
-    }
-    LOG.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
-        + ", timeout: " + String.valueOf(redisTimeout) + ")");
   }
 
   @Override
   public synchronized void start() {
     super.start();
 
-    channelProcessor = getChannelProcessor();
-
-    // TODO: consider using Connection Pool.
-    connect();
-
     runFlag = true;
-
     new Thread(new SubscribeManager()).start();
   }
 
@@ -131,8 +59,6 @@ public class RedisSubscribeDrivenSource extends AbstractSource implements Config
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-
-    // TODO: if we use jedis connection pool, destroy code must be inserted.
   }
 
   private class SubscribeManager implements Runnable {
