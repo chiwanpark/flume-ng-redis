@@ -8,6 +8,7 @@ import org.apache.flume.EventDeliveryException;
 import org.apache.flume.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.exceptions.JedisException;
 
 public class RedisListDrivenSink extends AbstractRedisSink {
   private static final Logger LOG = LoggerFactory.getLogger(RedisListDrivenSink.class);
@@ -65,6 +66,12 @@ public class RedisListDrivenSink extends AbstractRedisSink {
     } catch (Throwable e) {
       transaction.rollback();
       status = Status.BACKOFF;
+
+      // we need to rethrow jedis exceptions, because they signal that something went wrong
+      // with the connection to the redis server
+      if (e instanceof JedisException) {
+        throw e;
+      }
 
       if (e instanceof Error) {
         throw (Error) e;
