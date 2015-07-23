@@ -27,6 +27,9 @@ public abstract class AbstractRedisSink extends AbstractSink implements Configur
       jedis.auth(redisPassword);
     }
 
+    // try to connect here already to find out about problems early on
+    // TODO: we may need to throw a special kind of exception here
+    jedis.connect();
     super.start();
 
     LOG.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
