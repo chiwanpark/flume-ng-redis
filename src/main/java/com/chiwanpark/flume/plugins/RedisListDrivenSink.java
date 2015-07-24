@@ -70,6 +70,8 @@ public class RedisListDrivenSink extends AbstractRedisSink {
       // we need to rethrow jedis exceptions, because they signal that something went wrong
       // with the connection to the redis server
       if (e instanceof JedisException) {
+        // TODO: we could try to reconnect and resend immediately
+        jedis.disconnect();
         throw new EventDeliveryException(e);
       }
 
