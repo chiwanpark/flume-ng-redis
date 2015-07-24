@@ -74,7 +74,7 @@ public class RedisPublishDrivenSink extends AbstractRedisSink implements Configu
       // we need to rethrow jedis exceptions, because they signal that something went wrong
       // with the connection to the redis server
       if (e instanceof JedisException) {
-        throw e;
+        throw new EventDeliveryException(e);
       }
 
       if (e instanceof Error) {
