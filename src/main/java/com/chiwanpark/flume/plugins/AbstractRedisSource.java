@@ -8,13 +8,14 @@ import org.apache.flume.conf.Configurable;
 import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.BinaryJedis;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class AbstractRedisSource extends AbstractSource implements Configurable {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractRedisSource.class);
 
-  protected Jedis jedis;
+  protected BinaryJedis jedis;
   protected ChannelProcessor channelProcessor;
 
   private String redisHost;

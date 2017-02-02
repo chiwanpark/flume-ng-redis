@@ -21,31 +21,29 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.nio.charset.Charset;
-
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4.class)
 public class RawHandlerTest {
 
   @Test
   public void testRawMessageWithUTF8() throws Exception {
-    final String testMessage = "test-UTF8, 한글";
-    RawHandler handler = new RawHandler("utf-8");
+    final String charset = "UTF-8";
+    final byte[] testMessage = "test-UTF8, 한글".getBytes();
+    RawHandler handler = new RawHandler(charset);
     Event event = handler.getEvent(testMessage);
 
-    assertArrayEquals(testMessage.getBytes("utf-8"), event.getBody());
+    assertArrayEquals(testMessage, event.getBody());
   }
 
   @Test
   public void testSerializationWithUTF8() throws Exception {
-    final String charset = "utf-8";
-    final String testMessage = "test-UTF8, 한글";
+    final String charset = "UTF-8";
+    final byte[] testMessage = "test-UTF8, 한글".getBytes();
     RawHandler handler = new RawHandler(charset);
-    Event event = EventBuilder.withBody(testMessage, Charset.forName(charset));
+    Event event = EventBuilder.withBody(testMessage);
 
-    String result = handler.getString(event);
-    assertEquals(testMessage, result);
+    byte[] result = handler.getBytes(event);
+    assertArrayEquals(testMessage, result);
   }
 }

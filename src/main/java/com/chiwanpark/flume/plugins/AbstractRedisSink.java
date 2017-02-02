@@ -7,12 +7,12 @@ import org.apache.flume.conf.Configurable;
 import org.apache.flume.sink.AbstractSink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.BinaryJedis;
 
 public abstract class AbstractRedisSink extends AbstractSink implements Configurable {
   private static final Logger LOG = LoggerFactory.getLogger(AbstractRedisSink.class);
 
-  protected Jedis jedis;
+  protected BinaryJedis jedis;
 
   private String redisHost;
   private int redisPort;
@@ -22,7 +22,7 @@ public abstract class AbstractRedisSink extends AbstractSink implements Configur
 
   @Override
   public synchronized void start() {
-    jedis = new Jedis(redisHost, redisPort, redisTimeout);
+    jedis = new BinaryJedis(redisHost, redisPort, redisTimeout);
     if (!"".equals(redisPassword)) {
       jedis.auth(redisPassword);
     }

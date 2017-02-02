@@ -87,12 +87,12 @@ public class JSONHandler extends RedisMessageHandler {
    * {@inheritDoc}
    */
   @Override
-  public Event getEvent(String message) throws Exception {
+  public Event getEvent(byte[] message) throws Exception {
     /*
      * Gson throws Exception if the data is not parseable to JSON.
      * Need not catch it since the source will catch it and return error.
      */
-    JsonObject json = parser.parse(message).getAsJsonObject();
+    JsonObject json = parser.parse(new String(message, this.charset)).getAsJsonObject();
 
     String body = "";
     JsonElement bodyElm = json.get("body");
@@ -118,7 +118,7 @@ public class JSONHandler extends RedisMessageHandler {
   }
 
   @Override
-  public String getString(Event event) throws Exception {
+  public byte[] getBytes(Event event) throws Exception {
     JsonPrimitive body = new JsonPrimitive(new String(event.getBody(), charset));
     JsonObject obj = new JsonObject();
 
@@ -131,6 +131,6 @@ public class JSONHandler extends RedisMessageHandler {
       obj.add("headers", headers);
     }
 
-    return gson.toJson(obj);
+    return gson.toJson(obj).getBytes(charset);
   }
 }

@@ -35,15 +35,15 @@ public class RawHandler extends RedisMessageHandler {
    * {@inheritDoc}
    */
   @Override
-  public Event getEvent(String message) throws Exception {
-    return EventBuilder.withBody(message.getBytes(charset));
+  public Event getEvent(byte[] message) throws Exception {
+    return EventBuilder.withBody(message);
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public String getString(Event event) throws Exception {
-    return new String(event.getBody(), charset);
+  public byte[] getBytes(Event event) throws Exception {
+    return event.getBody();
   }
 }

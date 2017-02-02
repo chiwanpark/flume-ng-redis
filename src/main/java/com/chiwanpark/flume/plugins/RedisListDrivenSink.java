@@ -14,12 +14,12 @@ public class RedisListDrivenSink extends AbstractRedisSink {
   private static final Logger LOG = LoggerFactory.getLogger(RedisListDrivenSink.class);
 
   private int redisDatabase;
-  private String redisList;
+  private byte[] redisList;
 
   @Override
   public void configure(Context context) {
     redisDatabase = context.getInteger("redisDatabase", 0);
-    redisList = context.getString("redisList");
+    redisList = context.getString("redisList").getBytes();
 
     Preconditions.checkNotNull(redisList, "Redis List must be set.");
 
@@ -55,7 +55,7 @@ public class RedisListDrivenSink extends AbstractRedisSink {
       transaction.begin();
 
       Event event = channel.take();
-      String serialized = messageHandler.getString(event);
+      byte[] serialized = messageHandler.getBytes(event);
 
       if (jedis.lpush(redisList, serialized) > 0) {
         transaction.commit();
