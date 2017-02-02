@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 
 @RunWith(JUnit4.class)
-public class RedisSourceTestBase {
+public abstract class RedisSourceTestBase {
   private static final Logger LOG = LoggerFactory.getLogger(RedisSourceTestBase.class);
 
   protected Context context = new Context();

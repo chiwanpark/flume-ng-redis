@@ -43,7 +43,7 @@ public abstract class RedisMessageHandler {
    * @return Flume event generated from the request.
    * @throws Exception If there was an unexpected error.
    */
-  public abstract Event getEvent(String message) throws Exception;
+  public abstract Event getEvent(byte[] message) throws Exception;
 
   /**
    * Takes a event and returns a string representing the event. The result
@@ -54,5 +54,5 @@ public abstract class RedisMessageHandler {
    * @return String representing the given event.
    * @throws Exception If there was an unexpected error.
    */
-  public abstract String getString(Event event) throws Exception;
+  public abstract byte[] getBytes(Event event) throws Exception;
 }

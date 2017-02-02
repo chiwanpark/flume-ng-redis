@@ -29,11 +29,11 @@ import redis.clients.jedis.exceptions.JedisException;
 public class RedisPublishDrivenSink extends AbstractRedisSink implements Configurable {
   private static final Logger LOG = LoggerFactory.getLogger(RedisPublishDrivenSink.class);
 
-  private String redisChannel;
+  private byte[] redisChannel;
 
   @Override
   public void configure(Context context) {
-    redisChannel = context.getString("redisChannel");
+    redisChannel = context.getString("redisChannel").getBytes();
 
     Preconditions.checkNotNull(redisChannel, "Redis Channel must be set.");
 
@@ -58,7 +58,7 @@ public class RedisPublishDrivenSink extends AbstractRedisSink implements Configu
       transaction.begin();
 
       Event event = channel.take();
-      String serialized = messageHandler.getString(event);
+      byte[] serialized = messageHandler.getBytes(event);
 
       if (jedis.publish(redisChannel, serialized) > 0) {
         transaction.commit();

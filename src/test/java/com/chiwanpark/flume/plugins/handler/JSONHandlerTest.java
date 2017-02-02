@@ -33,7 +33,7 @@ import static org.junit.Assert.assertEquals;
 public class JSONHandlerTest {
   @Test
   public void testJson() throws Exception {
-    String jsonified = "{\"body\": \"hello\"}";
+    byte[] jsonified = "{\"body\": \"hello\"}".getBytes("UTF-8");
     JSONHandler handler = new JSONHandler("utf-8");
 
     Event event = handler.getEvent(jsonified);
@@ -47,7 +47,7 @@ public class JSONHandlerTest {
 
   @Test
   public void testJsonWithHeadersAndBody() throws Exception {
-    String jsonified = "{\"body\": \"hello\", \"headers\": {\"a\": \"123\", \"b\": \"hello\"}}";
+    byte[] jsonified = "{\"body\": \"hello\", \"headers\": {\"a\": \"123\", \"b\": \"hello\"}}".getBytes("utf-8");
     JSONHandler handler = new JSONHandler("utf-8");
 
     Event event = handler.getEvent(jsonified);
@@ -59,7 +59,7 @@ public class JSONHandlerTest {
 
   @Test
   public void testJsonWithoutEncoding() throws Exception {
-    String jsonified = "{\"body\": \"한글\"}";
+    byte[] jsonified = "{\"body\": \"한글\"}".getBytes("utf-8");
     JSONHandler handler = new JSONHandler();
 
     Event event = handler.getEvent(jsonified);
@@ -71,12 +71,12 @@ public class JSONHandlerTest {
   public void testJsonSerialization() throws Exception {
     final String message = "hello";
     final String charset = "utf-8";
-    final String expected = "{\"body\":\"hello\"}";
+    final byte[] expected = "{\"body\":\"hello\"}".getBytes(charset);
     JSONHandler handler = new JSONHandler(charset);
     Event event = EventBuilder.withBody(message, Charset.forName(charset));
 
-    String jsonified = handler.getString(event);
-    assertEquals(expected, jsonified);
+    byte[] jsonified = handler.getBytes(event);
+    assertArrayEquals(expected, jsonified);
   }
 
   @Test
@@ -86,23 +86,23 @@ public class JSONHandlerTest {
     headers.put("hello", "goodbye");
 
     final String charset = "utf-8";
-    final String expected = "{\"body\":\"hello\",\"headers\":{\"hello\":\"goodbye\"}}";
+    final byte[] expected = "{\"body\":\"hello\",\"headers\":{\"hello\":\"goodbye\"}}".getBytes(charset);
     JSONHandler handler = new JSONHandler(charset);
     Event event = EventBuilder.withBody(message, Charset.forName(charset), headers);
 
-    String jsonified = handler.getString(event);
-    assertEquals(expected, jsonified);
+    byte[] jsonified = handler.getBytes(event);
+    assertArrayEquals(expected, jsonified);
   }
 
   @Test
   public void testJsonSerde() throws Exception {
-    final String expected = "{\"body\":\"hello\",\"headers\":{\"hello\":\"goodbye\"}}";
     final String charset = "utf-8";
+    final byte[] expected = "{\"body\":\"hello\",\"headers\":{\"hello\":\"goodbye\"}}".getBytes(charset);
 
     JSONHandler handler = new JSONHandler(charset);
     Event event = handler.getEvent(expected);
-    String result = handler.getString(event);
+    byte[] result = handler.getBytes(event);
 
-    assertEquals(result, expected);
+    assertArrayEquals(result, expected);
   }
 }

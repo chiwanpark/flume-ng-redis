@@ -13,12 +13,12 @@ public class RedisListDrivenSource extends AbstractRedisSource implements Pollab
   private static final Logger LOG = LoggerFactory.getLogger(RedisListDrivenSource.class);
 
   private int redisDatabase;
-  private String redisList;
+  private byte[] redisList;
 
   @Override
   public void configure(Context context) {
     redisDatabase = context.getInteger("redisDatabase", 0);
-    redisList = context.getString("redisList");
+    redisList = context.getString("redisList").getBytes();
     Preconditions.checkNotNull(redisList, "Redis List must be set.");
 
     super.configure(context);
@@ -38,7 +38,7 @@ public class RedisListDrivenSource extends AbstractRedisSource implements Pollab
 
   @Override
   public Status process() throws EventDeliveryException {
-    String serialized = jedis.rpop(redisList);
+    byte[] serialized = jedis.rpop(redisList);
     if (serialized == null) {
       return Status.BACKOFF;
     }

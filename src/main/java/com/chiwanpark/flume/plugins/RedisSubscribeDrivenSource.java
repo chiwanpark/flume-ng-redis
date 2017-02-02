@@ -20,21 +20,22 @@ import org.apache.flume.Context;
 import org.apache.flume.EventDrivenSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.JedisPubSub;
+import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+import redis.clients.util.SafeEncoder;
 
 public class RedisSubscribeDrivenSource extends AbstractRedisSource implements EventDrivenSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(RedisSubscribeDrivenSource.class);
 
-  private String[] redisChannels;
+  private byte[][] redisChannels;
   private boolean runFlag;
 
   @Override
   public void configure(Context context) {
     String redisChannel = context.getString("redisChannel");
     Preconditions.checkNotNull(redisChannel, "Redis Channel must be set.");
-    redisChannels = redisChannel.split(",");
+    redisChannels = SafeEncoder.encodeMany(redisChannel.split(","));
 
     super.configure(context);
     LOG.info("Flume Redis Subscribe Source Configured");
@@ -64,7 +65,7 @@ public class RedisSubscribeDrivenSource extends AbstractRedisSource implements E
   private class SubscribeManager implements Runnable {
 
     private Thread subscribeRunner;
-    private JedisPubSub jedisPubSub;
+    private BinaryJedisPubSub jedisPubSub;
 
     @Override
     public void run() {
@@ -90,9 +91,9 @@ public class RedisSubscribeDrivenSource extends AbstractRedisSource implements E
 
   private class SubscribeRunner implements Runnable {
 
-    private JedisPubSub jedisPubSub;
+    private BinaryJedisPubSub jedisPubSub;
 
-    public SubscribeRunner(JedisPubSub jedisPubSub) {
+    public SubscribeRunner(BinaryJedisPubSub jedisPubSub) {
       LOG.info("Subscribe Runner Thread is started.");
 
       this.jedisPubSub = jedisPubSub;
@@ -113,10 +114,10 @@ public class RedisSubscribeDrivenSource extends AbstractRedisSource implements E
     }
   }
 
-  private class JedisSubscribeListener extends JedisPubSub {
+  private class JedisSubscribeListener extends BinaryJedisPubSub {
 
     @Override
-    public void onMessage(String channel, String message) {
+    public void onMessage(byte[] channel, byte[] message) {
       try {
         channelProcessor.processEvent(messageHandler.getEvent(message));
       } catch (Exception e) {
@@ -125,27 +126,27 @@ public class RedisSubscribeDrivenSource extends AbstractRedisSource implements E
     }
 
     @Override
-    public void onPMessage(String pattern, String channel, String message) {
+    public void onPMessage(byte[] pattern, byte[] channel, byte[] message) {
       // TODO: Pattern subscribe feature will be implemented.
     }
 
     @Override
-    public void onSubscribe(String channel, int subscribedChannels) {
+    public void onSubscribe(byte[] channel, int subscribedChannels) {
       LOG.info("onSubscribe (Channel: " + channel + ")");
     }
 
     @Override
-    public void onUnsubscribe(String channel, int subscribedChannels) {
+    public void onUnsubscribe(byte[] channel, int subscribedChannels) {
       LOG.info("onUnsubscribe (Channel: " + channel + ")");
     }
 
     @Override
-    public void onPUnsubscribe(String pattern, int subscribedChannels) {
+    public void onPUnsubscribe(byte[] pattern, int subscribedChannels) {
       // TODO: Pattern subscribe feature will be implemented.
     }
 
     @Override
-    public void onPSubscribe(String pattern, int subscribedChannels) {
+    public void onPSubscribe(byte[] pattern, int subscribedChannels) {
       // TODO: Pattern subscribe feature will be implemented.
     }
   }
