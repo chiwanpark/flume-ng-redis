@@ -8,8 +8,8 @@ Redis 3.2.8.
 
 ## Current Version
 
-* Development: 0.3.0-SNAPSHOT
-* Stable: 0.2.0
+* Development: 0.4.0-SNAPSHOT
+* Stable: 0.3.0
 
 ## Current Supported Features
 
@@ -44,7 +44,7 @@ Redis 3.2.8.
 
 ## License
 
-Copyright 2013-2015 Chiwan Park
+Copyright 2013-2017 Chiwan Park
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
