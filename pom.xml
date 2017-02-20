@@ -12,8 +12,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.sourceVersion>1.6</project.build.sourceVersion>
         <project.build.targetVersion>1.6</project.build.targetVersion>
-        <flume.version>1.5.0.1</flume.version>
-        <jedis.version>2.5.2</jedis.version>
+        <flume.version>1.6.0</flume.version>
+        <jedis.version>2.9.0</jedis.version>
         <coverall.version>2.2.0</coverall.version>
         <jacoco.version>0.7.2.201409121644</jacoco.version>
         <junit.version>4.11</junit.version>

@@ -1,7 +1,7 @@
 # Redis Extension for Flume NG
 
 Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)). Tested with Apache Flume 1.5.0.1 and
-Redis 2.8.17.
+Redis 3.2.8.
 
 [![Build Status](https://travis-ci.org/chiwanpark/flume-ng-redis.png?branch=master)](https://travis-ci.org/chiwanpark/flume-ng-redis)
 [![Coverage Status](https://coveralls.io/repos/chiwanpark/flume-ng-redis/badge.png)](https://coveralls.io/r/chiwanpark/flume-ng-redis)
@@ -40,7 +40,7 @@ Redis 2.8.17.
 
 ## Dependencies
 
-* Jedis 2.5.2 ([https://github.com/xetorthio/jedis](https://github.com/xetorthio/jedis))
+* Jedis ([https://github.com/xetorthio/jedis](https://github.com/xetorthio/jedis))
 
 ## License
 
