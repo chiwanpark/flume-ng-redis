@@ -1,6 +1,6 @@
 # Redis Extension for Flume NG
 
-Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)). Tested with Apache Flume 1.5.0.1 and
+Redis extension for Flume NG ([http://flume.apache.org](http://flume.apache.org)). Tested with Apache Flume 1.6.0 and
 Redis 3.2.8.
 
 [![Build Status](https://travis-ci.org/chiwanpark/flume-ng-redis.png?branch=master)](https://travis-ci.org/chiwanpark/flume-ng-redis)
@@ -13,8 +13,10 @@ Redis 3.2.8.
 
 ## Current Supported Features
 
-* Source using Redis [SUBSCRIBE](http://redis.io/commands/subscribe) command (multiple channels)
-* Sink using Redis [PUBLISH](http://redis.io/commands/publish) command (only for single channel)
+* Source using Redis [SUBSCRIBE](https://redis.io/commands/subscribe) command (multiple channels)
+* Source using Redis [RPOP](https://redis.io/commands/rpop) command (single list)
+* Sink using Redis [PUBLISH](https://redis.io/commands/publish) command (only for single channel)
+* Sink using Redis [LPUSH](https://redis.io/commands/lpush) command (single list)
 
 ## Usage
 
@@ -27,10 +29,10 @@ Redis 3.2.8.
 1. Copy ```flume-ng-redis-[VERSION].jar``` or ```flume-ng-redis-[VERSION]-jar-with-dependencies.jar``` into your flume
    library path.
 	* If you use ```flume-ng-redis-[VERSION].jar```, you have to download Jedis
-	  ([https://github.com/xetorthio/jedis](https://github.com/xetorthio/jedis)) and copy it to flume library path.
-1. Copy configuration sample file or create your own configuration.
+	  ([https://github.com/xetorthio/jedis](http configuration.
 1. Run Flume.
-	* Following command is sample for RedisSubscribeDrivenSource.
+	* Follos://github.com/xetorthio/jedis)) and copy it to flume library path.
+           1. Copy configuration sample file or create your ownwing command is sample for RedisSubscribeDrivenSource.
 
 			bin/flume-ng agent -n agent -c conf -f conf/example-SubscribeDrivenSource.properties -Dflume.root.logger=DEBUG,console
 	
