@@ -5,6 +5,7 @@ Redis 3.2.8.
 
 [![Build Status](https://travis-ci.org/chiwanpark/flume-ng-redis.png?branch=master)](https://travis-ci.org/chiwanpark/flume-ng-redis)
 [![Coverage Status](https://coveralls.io/repos/chiwanpark/flume-ng-redis/badge.png)](https://coveralls.io/r/chiwanpark/flume-ng-redis)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fchiwanpark%2Fflume-ng-redis.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fchiwanpark%2Fflume-ng-redis?ref=badge_shield)
 
 ## Current Version
 
@@ -59,3 +60,5 @@ Copyright 2013-2017 Chiwan Park
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fchiwanpark%2Fflume-ng-redis.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fchiwanpark%2Fflume-ng-redis?ref=badge_large)
