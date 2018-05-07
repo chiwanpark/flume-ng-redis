@@ -19,6 +19,7 @@ public abstract class AbstractRedisSink extends AbstractSink implements Configur
   private int redisTimeout;
   private String redisPassword;
   protected RedisMessageHandler messageHandler;
+  protected RedisSinkCounter counter;
 
   @Override
   public synchronized void start() {
@@ -30,6 +31,7 @@ public abstract class AbstractRedisSink extends AbstractSink implements Configur
     // try to connect here already to find out about problems early on
     // TODO: we may need to throw a special kind of exception here
     jedis.connect();
+    counter.start();
     super.start();
 
     LOG.info("Redis Connected. (host: " + redisHost + ", port: " + String.valueOf(redisPort)
@@ -39,6 +41,7 @@ public abstract class AbstractRedisSink extends AbstractSink implements Configur
   @Override
   public synchronized void stop() {
     jedis.disconnect();
+    counter.stop();
     super.stop();
   }
 
@@ -48,6 +51,10 @@ public abstract class AbstractRedisSink extends AbstractSink implements Configur
     redisPort = context.getInteger("redisPort", 6379);
     redisTimeout = context.getInteger("redisTimeout", 2000);
     redisPassword = context.getString("redisPassword", "");
+
+    if(counter == null) {
+      counter = new RedisSinkCounter(getName());
+    }
 
     try {
       String charset = context.getString("messageCharset", "utf-8");

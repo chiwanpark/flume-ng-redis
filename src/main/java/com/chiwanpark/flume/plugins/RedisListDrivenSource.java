@@ -46,10 +46,13 @@ public class RedisListDrivenSource extends AbstractRedisSource implements Pollab
     try {
       Event event = messageHandler.getEvent(serialized);
       getChannelProcessor().processEvent(event);
+      counter.incrementSourceSent();
     } catch (ChannelException e) {
       jedis.rpush(redisList, serialized);
+      counter.incrementSourceRetry();
       LOG.error("ChannelException is thrown.", e);
     } catch (Exception e) {
+      counter.incrementSourceError();
       LOG.error("RedisMessageHandler threw unexpected exception.", e);
     }
 
