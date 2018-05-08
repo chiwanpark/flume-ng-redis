@@ -120,7 +120,9 @@ public class RedisSubscribeDrivenSource extends AbstractRedisSource implements E
     public void onMessage(byte[] channel, byte[] message) {
       try {
         channelProcessor.processEvent(messageHandler.getEvent(message));
+        counter.incrementSourceSent();
       } catch (Exception e) {
+        counter.incrementSourceError();
         LOG.error("RedisMessageHandler threw unexpected exception.", e);
       }
     }

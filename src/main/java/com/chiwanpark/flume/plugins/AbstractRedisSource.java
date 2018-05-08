@@ -23,6 +23,7 @@ public class AbstractRedisSource extends AbstractSource implements Configurable 
   private int redisTimeout;
   private String redisPassword;
   protected RedisMessageHandler messageHandler;
+  protected RedisSourceCounter counter;
 
   @Override
   public void configure(Context context) {
@@ -30,6 +31,10 @@ public class AbstractRedisSource extends AbstractSource implements Configurable 
     redisPort = context.getInteger("redisPort", 6379);
     redisTimeout = context.getInteger("redisTimeout", 2000);
     redisPassword = context.getString("redisPassword", "");
+
+    if(counter == null) {
+      counter = new RedisSourceCounter(getName());
+    }
 
     try {
       String charset = context.getString("messageCharset", "utf-8");
@@ -82,10 +87,12 @@ public class AbstractRedisSource extends AbstractSource implements Configurable 
     channelProcessor = getChannelProcessor();
 
     connect();
+    counter.start();
   }
 
   @Override
   public synchronized void stop() {
+    counter.stop();
     super.stop();
   }
 }

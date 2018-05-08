@@ -53,18 +53,23 @@ public class RedisListDrivenSink extends AbstractRedisSink {
 
     try {
       transaction.begin();
+      long startTime = System.nanoTime();
 
       Event event = channel.take();
       byte[] serialized = messageHandler.getBytes(event);
 
       if (jedis.lpush(redisList, serialized) > 0) {
         transaction.commit();
+        long endTime = System.nanoTime();
+        counter.incrementSinkSendTimeMicros((endTime - startTime) / (1000));
+        counter.incrementSinkSuccess();
         status = Status.READY;
       } else {
         throw new EventDeliveryException("Event cannot be pushed into list " + redisList);
       }
     } catch (Throwable e) {
       transaction.rollback();
+      counter.incrementSinkRollback();
       status = Status.BACKOFF;
 
       // we need to rethrow jedis exceptions, because they signal that something went wrong

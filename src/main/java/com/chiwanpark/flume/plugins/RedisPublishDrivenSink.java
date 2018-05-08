@@ -56,12 +56,16 @@ public class RedisPublishDrivenSink extends AbstractRedisSink implements Configu
 
     try {
       transaction.begin();
+      long startTime = System.nanoTime();
 
       Event event = channel.take();
       byte[] serialized = messageHandler.getBytes(event);
 
       if (jedis.publish(redisChannel, serialized) > 0) {
         transaction.commit();
+        long endTime = System.nanoTime();
+        counter.incrementSinkSendTimeMicros((endTime - startTime) / (1000));
+        counter.incrementSinkSuccess();
         status = Status.READY;
       } else {
         throw new EventDeliveryException(
@@ -69,6 +73,7 @@ public class RedisPublishDrivenSink extends AbstractRedisSink implements Configu
       }
     } catch (Throwable e) {
       transaction.rollback();
+      counter.incrementSinkRollback();
       status = Status.BACKOFF;
 
       // we need to rethrow jedis exceptions, because they signal that something went wrong
